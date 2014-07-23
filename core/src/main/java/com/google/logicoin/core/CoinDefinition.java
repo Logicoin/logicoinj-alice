@@ -16,7 +16,7 @@ public class CoinDefinition {
 
 
     public static final String coinName = "LogiCoin";
-    public static final String coinTicker = "LGC";
+    public static final String coinTicker = "LOGIC";
     public static final String coinURIScheme = "Logicoin";
     public static final String cryptsyMarketId = "26";
     public static final String cryptsyMarketCurrency = "BTC";

@@ -896,7 +896,7 @@ public class Wallet implements Serializable, BlockChainListener, PeerFilterProvi
         BigInteger valueSentToMe = tx.getValueSentToMe(this);
         BigInteger valueDifference = valueSentToMe.subtract(valueSentFromMe);
 
-        log.info("Received tx{} for {} LGC: {} [{}] in block {}", new Object[]{sideChain ? " on a side chain" : "",
+        log.info("Received tx{} for {} LOGIC: {} [{}] in block {}", new Object[]{sideChain ? " on a side chain" : "",
                 logicoinValueToFriendlyString(valueDifference), CoinDefinition.coinTicker,tx.getHashAsString(), relativityOffset,
                 block != null ? block.getHeader().getHash() : "(unit test)"});
 
@@ -1959,17 +1959,17 @@ public class Wallet implements Serializable, BlockChainListener, PeerFilterProvi
 
             List<TransactionInput> originalInputs = new ArrayList<TransactionInput>(req.tx.getInputs());
 
-            // We need to know if we need to add an additional fee because one of our values are smaller than 1 LGC
+            // We need to know if we need to add an additional fee because one of our values are smaller than 1 LOGIC
             boolean needAtLeastReferenceFee = false;
             int txOutDustFeeCount = 0;
             if (req.ensureMinRequiredFee && !req.emptyWallet) { // min fee checking is handled later for emptyWallet
                 for (TransactionOutput output : req.tx.getOutputs())
-                    if (output.getValue().compareTo(Utils.COIN) < 0) { //TXOut lower than 1 LGC have a 2 LGC fee!
+                    if (output.getValue().compareTo(Utils.COIN) < 0) { //TXOut lower than 1 LOGIC have a 2 LOGIC fee!
                         //TODO Currently logicoin doesn't have this. We can put it back in later.
 //                        if (output.getValue().compareTo(output.getMinNonDustValue()) < 0)
 //                            throw new IllegalArgumentException("Tried to send dust with ensureMinRequiredFee set - no way to complete this");
                         needAtLeastReferenceFee = true;
-                        txOutDustFeeCount++; //LGC: Each TXOut < 1 LGC needs +1 LGC fee!
+                        txOutDustFeeCount++; //LOGIC: Each TXOut < 1 LOGIC needs +1 LOGIC fee!
                     }
             }
 
@@ -2331,7 +2331,7 @@ public class Wallet implements Serializable, BlockChainListener, PeerFilterProvi
         lock.lock();
         try {
             StringBuilder builder = new StringBuilder();
-            builder.append(String.format("Wallet containing %s LGC in:%n", logicoinValueToFriendlyString(getBalance())));
+            builder.append(String.format("Wallet containing %s LOGIC in:%n", logicoinValueToFriendlyString(getBalance())));
             builder.append(String.format("  %d unspent transactions%n", unspent.size()));
             builder.append(String.format("  %d spent transactions%n", spent.size()));
             builder.append(String.format("  %d pending transactions%n", pending.size()));
@@ -3367,7 +3367,7 @@ public class Wallet implements Serializable, BlockChainListener, PeerFilterProvi
                 if (needAtLeastReferenceFee && fees.compareTo(Transaction.REFERENCE_DEFAULT_MIN_TX_FEE) < 0)
                     fees = Transaction.REFERENCE_DEFAULT_MIN_TX_FEE;
 
-                //LGC: Add 1 LGC fee per txOut < 1 LGC
+                //LOGIC: Add 1 LOGIC fee per txOut < 1 LOGIC
                 if (txOutDustFeeCount > 0)
                     fees = fees.add(Transaction.REFERENCE_DEFAULT_MIN_TX_FEE.multiply(BigInteger.valueOf(txOutDustFeeCount)));
 
@@ -3397,7 +3397,7 @@ public class Wallet implements Serializable, BlockChainListener, PeerFilterProvi
                 if (additionalValueSelected != null)
                     change = change.add(additionalValueSelected);
 
-                // If change is < 1 LGC, we will need to have at least minfee to be accepted by the network
+                // If change is < 1 LOGIC, we will need to have at least minfee to be accepted by the network
                 if (req.ensureMinRequiredFee && !change.equals(BigInteger.ZERO) && change.compareTo(Utils.COIN) < 0) {
                     // This solution may fit into category 2, but it may also be category 3, we'll check that later
                     eitherCategory2Or3 = true;
@@ -3419,12 +3419,12 @@ public class Wallet implements Serializable, BlockChainListener, PeerFilterProvi
                     // If the change output would result in this transaction being rejected as dust, just drop the change and make it a fee
                     if (req.ensureMinRequiredFee && BigInteger.valueOf(100000000).compareTo(change) > 0) {
                         // This solution definitely fits in category 3
-                        //Throw away change lower than 1 LGC as this is cheaper than paying the 1 LGC fee.
+                        //Throw away change lower than 1 LOGIC as this is cheaper than paying the 1 LOGIC fee.
                         isCategory3 = true;
                         //additionalValueForNextCategory = Transaction.REFERENCE_DEFAULT_MIN_TX_FEE.add(
                         //                                 Transaction.MIN_NONDUST_OUTPUT.add(BigInteger.ONE));
                         additionalValueForNextCategory = Transaction.REFERENCE_DEFAULT_MIN_TX_FEE.add(BigInteger.ONE);
-                                                         //LGC: We don't have a min value, but we add more fees for tx < 1
+                                                         //LOGIC: We don't have a min value, but we add more fees for tx < 1
                     } else {
                         size += changeOutput.logicoinSerialize().length + VarInt.sizeOf(req.tx.getOutputs().size()) - VarInt.sizeOf(req.tx.getOutputs().size() - 1);
                         // This solution is either category 1 or 2
